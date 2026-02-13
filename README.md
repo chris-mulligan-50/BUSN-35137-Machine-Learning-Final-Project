@@ -17,6 +17,14 @@ For each game on date t:
 - Data/: input data (betting lines and box scores)
 - Images/: figures saved by the notebook
 
+## Large data download (not in repo)
+Two oversized files are excluded from GitHub due to the 2 GB limit:
+- Data/Game Data/nba.sqlite
+- Data/Game Data/play_by_play.csv
+
+Download them from Kaggle and place them in the same paths above:
+https://www.kaggle.com/datasets/wyattowalsh/basketball
+
 ## Run order (recommended)
 1. Open FINALPROJECT.ipynb.
 2. Restart kernel.
