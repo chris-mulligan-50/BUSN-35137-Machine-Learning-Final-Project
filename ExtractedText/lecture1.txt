@@ -1,0 +1,1301 @@
+
+
+--- Page 1 ---
+
+Machine Learning in Finance
+Lecture 1: A Crash Course in Supervised Learning
+J. Leland Bybee (University of Chicago)
+January 5, 2026
+
+--- Page 2 ---
+
+What is Machine Learning?
+1. Discovering structure and making predictions from (large) data sets
+2. Not one thing, but a collection of techniques, some general principles:
+2.1 Regularization and methods to prevent overfitting (bias-variance trade-off)
+2.2 Efficient/approximate algorithms to solve large optimization problems
+2.3 Tradeoff between interpretability and predictability
+3. You’ll learn a series of tools and see examples of how they’re applied, learn by doing!
+
+--- Page 3 ---
+
+What is Machine Learning?
+1. Discovering structure and making predictions from (large) data sets
+2. Not one thing, but a collection of techniques, some general principles:
+2.1 Regularization and methods to prevent overfitting (bias-variance trade-off)
+2.2 Efficient/approximate algorithms to solve large optimization problems
+2.3 Tradeoff between interpretability and predictability
+3. You’ll learn a series of tools and see examples of how they’re applied, learn by doing!
+
+--- Page 4 ---
+
+What is Machine Learning?
+
+
+--- Page 5 ---
+
+What is Machine Learning?
+
+
+--- Page 6 ---
+
+What is Machine Learning?
+
+
+--- Page 7 ---
+
+Supervised Learning
+1.Make predictions:
+given some data(X1,Y 1), ...,(X n,Y n), predictYn+1 givenX n+1.
+
+--- Page 8 ---
+
+Supervised Learning
+
+
+--- Page 9 ---
+
+Supervised Learning
+
+
+--- Page 10 ---
+
+Supervised Learning
+
+
+--- Page 11 ---
+
+Unsupervised Learning
+1.Discover structure:
+GivenX 1, ...,X n, find some structure/groups in the data.
+
+--- Page 12 ---
+
+Unsupervised Learning
+
+
+--- Page 13 ---
+
+Unsupervised Learning
+
+
+--- Page 14 ---
+
+Unsupervised Learning
+
+
+--- Page 15 ---
+
+Course Evaluation
+1. HW 1 (Due 1/26)
+2. HW 2 (Due 2/9)
+3. HW 3 (Due 2/23)
+4. HW 4 (Due 3/9)
+5. Course Project
+5.1 Proposal (Due 2/2)
+5.2 Presentation (In-Class)
+5.3 Final Paper (Due 3/2)
+6. Think of this as 3 projects.
+7. This is a tools-based class, you need to get your hands dirty with data and code!
+
+--- Page 16 ---
+
+Using AI in this Course
+1. Using AI/LLMs is encouraged in this class!
+2.Everyoneshould be working with Claude Code
+
+--- Page 17 ---
+
+Course Outline
+
+--- Page 18 ---
+
+Lecture 1: A Crash Course in Supervised Learning
+1. Linear Models
+2. Penalized estimation (Ridge, Lasso, etc.)
+3. Model selection (cross-validation, AIC/BIC)
+4. PCR/PLS
+5. Classification (SVM, logistic regression)
+6. Kernel methods
+7. Regression Trees
+8. Neural Networks
+
+--- Page 19 ---
+
+Lecture 2: Forecasting in Finance
+1. What’s special about ML in finance?
+2. The virtue of complexity
+3. Empirical asset pricing via machine learning
+4. Making ML implementable
+5. Alternative signals
+
+--- Page 20 ---
+
+Lecture 3: The Factor Zoo
+1. The origins of the factor zoo
+2. Is the factor zoo replicable?
+3. Can we tame the factor zoo?
+4. Can we learn some true representation of the factor zoo?
+
+--- Page 21 ---
+
+Lecture 4: A Crash Course in Unsupervised Learning
+1. PCA
+2. K-means
+3. Gaussian mixture models
+4. Hierarchical clustering
+5. Manifold learning and kernel PCA
+6. Latent dirichlet allocation
+7. Autoencoders
+
+--- Page 22 ---
+
+Lecture 5: Unstructured Data in Finance
+1. Using word counts in finance
+2. Topic modeling
+2.1 Macro implications
+2.2 Asset pricing implications
+3. Learning network structures from text
+4. Forecasting with text
+
+--- Page 23 ---
+
+Lecture 6: LLMs and the Future
+1. The basics of transformers
+2. LLMs as human proxies
+3. LLMs for signal extraction
+4. Embeddings
+5. Forecasting with LLMs
+
+--- Page 24 ---
+
+Lecture 7: Reinforcement Learning
+1. RL basics
+2. RL in finance
+3. RL for LLMs
+4. DSPy
+
+--- Page 25 ---
+
+A Crash Course in Supervised Learning
+
+--- Page 26 ---
+
+Linear Models
+1. Linear regression models have the form:
+yn =𝛽 ′xn +𝜀 n ,Y=X𝛽+𝜀(1)
+2. AssumeE[Y|X]is linear, or reasonable approximation
+3.Ordinary least squares (OLS)estimation:
+min
+𝛽0,𝛽
+N∑︁
+n=1
+(yn −𝛽 0 −𝛽 ′xn)2 (2)
+which yields a solution:ˆ𝛽=(X ′X) −1X ′Y
+4.Gauss-Markov Theorem:under limited conditions:
+4.1 OLS is efficient among the class ofunbiasedestimators
+4.2 OLS isBLUE
+4.3 There may be other biased estimators with a lower variance...
+
+--- Page 27 ---
+
+The Limits of OLS
+1.Predictive ability:linear regression fits often don’t predict well whenP(number of
+predictors) is large. This isn’t even a point about non-linearities—even with many linear
+features relative to sample size, fit is poor.
+2.Interpretability:whenPis large it may be hard to interpret the important features. We might
+want to find some smaller set ofimportant variablesfor the sake of interpretation
+
+--- Page 28 ---
+
+The Limits of OLS
+1.Predictive ability:linear regression fits often don’t predict well whenP(number of
+predictors) is large. This isn’t even a point about non-linearities—even with many linear
+features relative to sample size, fit is poor.
+2.Interpretability:whenPis large it may be hard to interpret the important features. We might
+want to find some smaller set ofimportant variablesfor the sake of interpretation
+
+--- Page 29 ---
+
+The Limits of OLS
+1.Suppose:𝜀 n ∼N(0, 𝜎 2)andN −1X ′X=I p, then
+1.1 ˆ𝛽∼N(𝛽, 𝜎 2/N)
+1.2 ˆyn ∼N(x ′
+n 𝛽,x ′
+nxn𝜎2/N)
+1.3 SinceN −1X ′X=I p, letx′
+nxn =cP, then ˆyn ∼N(x ′
+n 𝛽,cP𝜎 2/N)
+2. WhenP/N→0,E[(x ′
+n ˆ𝛽−x ′
+n 𝛽) 2] →0
+3. But whenP/N>>0,E[(x ′
+n ˆ𝛽−x ′
+n 𝛽) 2]↛0
+OLS struggles whenPis large relative toN!
+
+--- Page 30 ---
+
+The Bias-Variance Trade-off
+▶ Suppose we get some new sample from the same distribution,(xi,y i). We’re generally
+interested in minimizing the expected prediction error (PE):
+PE(ˆf(x i))=E[(y i − ˆf(x i)) 2]
+=𝜎 2 +MSE( ˆf(x i))
+(3)
+▶ So predictive error is proportional to MSE... and MSE:
+MSE(ˆf(x i))=E[( ˆf(x i) −f(x i)) 2]
+=[Bias( ˆf(x i))] 2 +Var( ˆf(x i))
+(4)
+
+--- Page 31 ---
+
+The Bias-Variance Trade-off
+▶ OLS is BLUE, but it doesn’t mean it’s the best predictor (i.e. it minimizes MSE/PE)
+▶ There may be other estimators with lower variance...
+
+
+--- Page 32 ---
+
+Ridge Regression
+▶ One alternative:ridge regression(also called L2-regularization, also Tikhonov
+regularization...)
+ˆ𝛽ridge =argmin 𝛽
+N∑︁
+i=1
+
+yi −x T
+i 𝛽
+ 2
++𝜆
+P∑︁
+p=1
+𝛽2
+p
+=argmin 𝛽 ||Y−X𝛽|| 2 +𝜆||𝛽|| 2
+2
+=(X ′X+𝜆I) −1X ′Y
+(5)
+▶ Unlike lasso (which we’ll see shortly), ridge has a closed form, intuition of relationship to OLS
+is clear.
+
+--- Page 33 ---
+
+Ridge Regression
+
+
+--- Page 34 ---
+
+Ridge Regression
+▶ Important Details:
+1. When we include a constant/intercept we generally don’t penalize it. You can accomplish this by
+separately de-meaning your data, but most implementations handle this well with some params
+(double check!)
+2. The penalty term is unfair to different predictors if they’re not on the same scale. You should
+standardize your data before applying ridge regression (or any other regularization method).
+
+--- Page 35 ---
+
+Ridge Regression
+▶ How does bias and variance change with𝜆?
+▶ The bias increases as𝜆increases
+▶ The variance decreases as𝜆increases
+▶ What is the bias at𝜆=0? What is the variance at𝜆=∞?
+
+--- Page 36 ---
+
+Ridge Regression
+
+
+--- Page 37 ---
+
+Ridge Regression
+𝜆shrinks all the coefficients towards zero but doesn’t necessarily set any of them to zero...
+
+
+--- Page 38 ---
+
+Ridge Regression
+An example with factors driving prostate cancer:
+Would be great if we could introduce some sparsity here...
+
+--- Page 39 ---
+
+Lasso
+Here is the comparable path with Lasso... It seems to have the sparsity we want!
+
+--- Page 40 ---
+
+Lasso
+▶ Lasso (or Least Absolute Selection and Shrinkage Operator) is a penalized regression method
+that can set some coefficients to zero:
+ˆ𝛽lasso =argmin 𝛽
+N∑︁
+i=1
+
+yi −x T
+i 𝛽
+ 2
++𝜆
+P∑︁
+p=1
+|𝛽 p|
+=argmin 𝛽 ||Y−X𝛽|| 2 +𝜆||𝛽|| 1
+(6)
+▶ Only difference from ridge: the penalty term is||𝛽||1 instead of||𝛽|| 2
+2
+
+--- Page 41 ---
+
+Lasso
+
+
+--- Page 42 ---
+
+Lasso
+▶ Important Details:
+1. When we include a constant/intercept we generally don’t penalize it. You can accomplish this by
+separately de-meaning your data, but most implementations handle this well with some params
+(double check!)
+2. The penalty term is unfair to different predictors if they’re not on the same scale. You should
+standardize your data before applying ridge regression (or any other regularization method).
+
+--- Page 43 ---
+
+Lasso
+How about the bias and variance trade-off?
+
+
+--- Page 44 ---
+
+Lasso
+So lasso and ridge are comparable on prediction error, why do we want it? Big benefits for
+interpretability:
+
+
+--- Page 45 ---
+
+A Constrained Optimization Perspective
+We can equivalently write the ridge/lasso problems as constrained optimization problems:
+ˆ𝛽ridge =argmin 𝛽
+N∑︁
+i=1
+
+yi −x T
+i 𝛽
+ 2
+s.t.||𝛽|| 2
+2 <t(7)
+ˆ𝛽lasso =argmin 𝛽
+N∑︁
+i=1
+
+yi −x T
+i 𝛽
+ 2
+s.t.||𝛽|| 1 <t(8)
+▶ So we’re trying to minimize the prediction error subject to a constraint on the size of the
+coefficients
+
+--- Page 46 ---
+
+A Constrained Optimization Perspective
+▶ The constraint is a ball around the origin, so the solution is the point on the boundary of the
+ball that minimizes the prediction error
+▶ Why does lasso set some coefficients to zero?
+
+--- Page 47 ---
+
+A Bayesian Perspective
+Penalized estimation has a Bayesian interpretation (penalty is related to the prior)
+▶ Ridge/L2 is equivalent to a Gaussian prior on𝛽
+▶ Lasso/L1 is equivalent to a Laplace prior on𝛽
+
+
+--- Page 48 ---
+
+Alternative Penalties
+min
+𝛽
+N∑︁
+n=1
+©­
+«
+yn −
+P∑︁
+p=1
+𝛽pxp,n
+ª®
+¬
+2
++𝜆
+P∑︁
+p=1
+𝛽p
+q
+(9)
+▶ qis a tuning parameter...
+
+--- Page 49 ---
+
+Alternative Penalties
+1. One alternative:Elastic Net,
+𝜆©­
+«
+𝛼
+P∑︁
+p=1
+𝛽p
+ + (1−𝛼)
+P∑︁
+p=1
+𝛽2
+p
+ª®
+¬
+(10)
+2. Can accomplish both shrinkage and selection and easier to compute than differentqs:
+There is further room for creativity in the penalty term, e.g.: group lasso, fused lasso, etc.
+
+--- Page 50 ---
+
+Model Selection
+
+--- Page 51 ---
+
+Model Selection
+
+
+--- Page 52 ---
+
+Model Selection
+1. All our regularization methods will have some tuning parameters (e.g.𝜆)
+2. How do we choose these? We call this procedure “model selection” as each choice of𝜆gives
+us a different model
+3. We want to maximize predictive accuracy (interpretation is an interesting alternative target but
+much harder)
+
+--- Page 53 ---
+
+Validation Set Approach
+1.Goal:estimate test error for a supervised learning model
+2.Strategy:
+2.1 Split the data into two parts
+2.2 Train the model on first part
+2.3 Compute the error on the second part
+
+
+--- Page 54 ---
+
+Validation Set Approach
+▶ Take different polynomial expansions and compute the test error
+▶ Lots of variation across validation samples!
+
+--- Page 55 ---
+
+Leave One Out Cross-Validation
+1. For everyi=1, ...,n:
+1.1 Train model on all points excepti
+1.2 Compute the test error on the held out point
+2. Average the test errors
+
+
+--- Page 56 ---
+
+Leave One Out Cross-Validation
+1. For everyi=1, ...,n:
+1.1 Train model on all points excepti
+1.2 Compute the test error on the held out point
+2. Average the test errors
+CV(n) = 1
+n
+n∑︁
+i=1
+(yi − ˆy (−i)
+i )2 (11)
+Form prediction forith sample without usingith sample
+
+--- Page 57 ---
+
+Leave one out cross-validation
+1. ComputingCV (n) is generally computationally expensive, since we have to fit the modeln
+times.
+▶ E.g. for linear regression runtime isO(p3 +np 2)
+2. For linear regression there is a shortcut:
+CV(n) = 1
+n
+n∑︁
+i=1
+(yi − ˆyi)2
+(1−h i)2 (12)
+where
+hi = 𝜕ˆyi
+𝜕yi
+=(X(X TX) −1XT )ii (13)
+hi = leverage statistic
+
+--- Page 58 ---
+
+k-fold Cross-Validation
+1. Split the data intokparts/folds
+2. For everyi=1, ...,k:
+2.1 Train the model on all but theith fold
+2.2 Compute the test error on theith fold
+3. Average the test errors
+
+
+--- Page 59 ---
+
+LOOCV vs.k-fold Cross-Validation
+1.k-fold can vary somewhat based on the folds
+2. Ink-fold we train the model on less data, this can introducebiasinto our estimate of the test
+error
+3. In LOOCV the training samples are very similar, this introducesvarianceinto our estimate of
+the test error
+
+--- Page 60 ---
+
+Choosing an Optimal Model
+Even when the CV error differs from true test error, the model with the lowest CV error is often the
+best model.
+
+--- Page 61 ---
+
+The One Standard Error Rule
+1. We may prefer a simpler model even if it has
+marginally higher CV error
+2. One way to evaluate that:one standard
+error rule
+2.1 Compute SE around each estimate
+2.2 Select the simplest model within one SE of
+the lowest CV error
+
+--- Page 62 ---
+
+Alternative Methods of Model Selection
+1.Akaike information criterion (AIC):
+AIC=− 2
+N LL+2 P
+N (14)
+1.1 LL is proportional to MSE for OLS
+1.2 A bias corrected version of AIC:AICc =AIC+ 2P(P+1)
+N−P−1
+2.Bayesian information criterion (BIC):
+BIC=− 2
+N LL+ P
+N log(N)(15)
+2.1 Penalizes large models more than AIC
+
+--- Page 63 ---
+
+AIC vs. BIC
+1. BIC isasymptotically consistent, AIC is not
+1.1 Given a family of models, probability that BIC selects the correct model→1asN→ ∞
+1.2 AIC picks models that are too large even asN→ ∞
+2. That said, in finite samples BIC often selects too small a model and AIC outperforms
+
+--- Page 64 ---
+
+Alternative Methods of Model Selection
+
+
+--- Page 65 ---
+
+Things to Keep in Mind with Model Selection
+1. There are often many choices that go into model construction
+2. Each of these choices is a “tuning-parameter”
+3. We need to do cross-validation over all these choices, failing to do so can lead to bias
+
+--- Page 66 ---
+
+Principal Components Regression & Partial Least Squares
+
+--- Page 67 ---
+
+Principal Components Analysis
+▶ Often our data consists of many correlated features
+▶ Dimension reduction: find a lower dimensional representation of the data (we’ll cover more
+in lecture 4):
+X=FΓ(16)
+whereF∈R N×K is a matrix ofKorthogonal factors andΓ∈R K×P is a matrix of factor
+loadings andK<<P.
+▶ Latent factor modeling
+
+--- Page 68 ---
+
+Principal Components Analysis
+▶ PCA transforms our data,X, into a set of linearly uncorrelated variables with the same
+dimension asX, calledprincipal components
+PCA via eigenvalue decomposition:X′X=VDV ′
+1. Columns ofV=(v 1, ...,v P)are
+eigenvectors,V ′V=I
+2.Dis a diagonal matrix of eigenvalues,
+D=diag(𝜆 1, ..., 𝜆 P)in decreasing order
+3.z 1 =Xv 1 is the first principal component
+(direction of largest sample variance)
+4.Z=XVis the matrix of principal
+components
+
+
+--- Page 69 ---
+
+Principal Components Analysis
+ApproximateXwith a lower dimensional representation:
+X=[z 1,z 2,z 3] [v1,v 2,v 3]′ ≈ ˜X1 =z 1v ′
+1 or ˜X2 =[z 1,z 2] [v1,v 2]′ (17)
+˜X1 is the best rank 1 approximation ofXin the least squares sense,˜X2 is the best rank 2
+approximation ofXin the least squares sense.
+
+--- Page 70 ---
+
+Principal Components Regression
+1. The eigen-vectors or PC “directions” define linear combos (Z=XV)
+2. ReplaceXin forecasting model with firstKPCs:
+yt+1 =𝛽 ′xt +𝜀 t →y t+1 =𝛽 ′zt +𝜀 t (18)
+3. Counteracts issues due to:
+▶ LargePrelative toT
+▶ Correlatedxs
+4. Sensitive to the scaling of the original predictors (need to standardizeXfirst)
+
+--- Page 71 ---
+
+Factor Relevance & Principal Components
+▶ PCR separates factor estimation from forecasting problem
+▶ Is this a problem?
+▶ There are relevant factors (KF of them) and irrelevant factors (KG of them)
+▶ IfG t contains dominant PCs then PCR can run into trouble
+▶ Good case: forecast is mis-specified
+▶ Bad case: fail to detectFt
+
+--- Page 72 ---
+
+Partial Least Squares
+1.1st Pass:Estimate the time-series covariance ofxandy:
+yt+1 =𝛾 i xi,t +𝜀 i,t (19)
+▶ Get “first-pass” coefficients for eachi
+▶ Coarse estimates of true loadings
+2.2nd Pass:estimate cross-sectional regression ofx t on𝛾:
+xi,t =F t ˆ𝛾i +𝜀 i,t (20)
+▶ Delivers “second-pass” factor estimates for eacht.
+3.3rd Pass:estimate the time-series regression ofyon estimated factorsF:
+yt+1 =𝛽 ′ ˆFt +𝜂 t+1 (21)
+▶ Delivers “third-pass” coefficients
+▶ Along with forecast:ˆyt+1 = ˆ𝛽′ ˆFt
+This all gives you the first PLS component. To get the others substituteˆ𝜂t+1 fory t+1 and start over.
+
+--- Page 73 ---
+
+Partial Least Squares
+▶ PLS emphasizesCorr(Y,X)in the factor estimation step:
+▶ PCA solvesmaxΓ Var(XΓ)
+▶ PLS solvesmaxΓ Cov(Y,XΓ)Var(XΓ)
+▶ Avoids the “irrelevant” factors (Gt) that can complicate PCR!
+
+--- Page 74 ---
+
+When might you want to use ridge vs. lasso vs. PLS?
+
+--- Page 75 ---
+
+Classification
+
+--- Page 76 ---
+
+Classification
+So far we have focused on predicting continuous outcomes, but we could also predict discrete
+outcomes, this is calledclassification. Examples:
+▶ Predicting whether a stock will go up or down based on past returns
+▶ Predicting whether a firm will go bankrupt based on financial ratios
+▶ Predicting the next president based on various measurements
+
+--- Page 77 ---
+
+Classification
+▶ Let’s start with a simple binary outcome,yi ∈ {0,1}.
+▶ We can use a linear model to predict whether ofyi =1givenx i:
+ˆ𝛽0, ˆ𝛽=arg min
+𝛽0,𝛽
+N∑︁
+i=1
+(yi −𝛽 0 −x T
+i 𝛽) 2 (22)
+▶ Then given some new inputxn+1 we can predictyn+1 =1if:
+ˆ𝛽0 +x T
+n+1 ˆ𝛽 >0.5(23)
+
+--- Page 78 ---
+
+Classification
+This often works quite well:
+
+
+--- Page 79 ---
+
+Generalized Linear Models
+1. Generalized linear models (GLMs) are a
+class of models that can handle classification
+and other objectives well (introduce a link
+function to map the output to a different
+space)
+2. Logistic regression:
+p(x)= 1
+1+e −𝛽0 −ÍK
+k=1 𝛽k xk
+(24)
+3. We won’t cover in detail but everything
+we’ve discussed generalizes here
+
+--- Page 80 ---
+
+Multiple Labels?
+1. What if I have more than one discrete label?
+2. Several options:
+2.1 Multinomial logistic regression (naturally extends logistic regression to multiple classes)
+2.2 Linear discriminant analysis (LDA)
+2.3 Support vector machines with one-vs-rest
+
+--- Page 81 ---
+
+Support Vector Machines & Kernel Methods
+
+--- Page 82 ---
+
+Support Vector Machines
+▶ Binary classification can be viewed as a task of separating classes in feature space:
+
+
+--- Page 83 ---
+
+Support Vector Machines
+▶ How do we select the optimal hyperplane?
+
+
+--- Page 84 ---
+
+Support Vector Machines
+▶ The distance from each example isr=wTxi +b
+| |w| |
+▶ The closest observations to the hyperplane are called thesupport vectors
+▶ Themargin(𝜌) is the distance from the hyperplane to the closest support vectors
+
+
+--- Page 85 ---
+
+Support Vector Machines
+▶ Our goal then:maximize the margin
+▶ Only support vectors matter, other examples can be ignored
+
+
+--- Page 86 ---
+
+Support Vector Machine Optimization
+▶ Findwandbthat minimize:
+Φ(w)=w Tw(25)
+for all observations such thatyi (wTxi +b) ≥1
+▶ The dual problem is to maximize:
+Φ(𝛼)=
+N∑︁
+i=1
+𝛼i − 1
+2
+N∑︁
+i=1
+N∑︁
+j=1
+𝛼i 𝛼j yi yjxT
+i xj (26)
+such thatÍN
+i=1 𝛼i yi =0and𝛼 i ≥0
+▶ The resulting classifier:
+f(x)=
+N∑︁
+i=1
+𝛼i yixT
+i x+b(27)
+
+--- Page 87 ---
+
+Soft Margin Classification
+▶ Can incorporate “slack” variables,𝜉i, to make margins “soft”
+▶ Can help to reduce overfitting, won’t go into detail on math
+
+--- Page 88 ---
+
+Kernel Methods
+▶ For datasets that are linearly separable, this method works great:
+▶ But what if the dataset is not linearly separable?
+▶ Maybe we could map it into a higher dimensional space?
+
+
+--- Page 89 ---
+
+Kernel Methods
+▶ Generalidea: maporiginalfeaturesintoahigherdimensionalspacewherethingsareseparable
+
+
+--- Page 90 ---
+
+Kernel Methods
+▶ Generalidea: maporiginalfeaturesintoahigherdimensionalspacewherethingsareseparable
+
+
+--- Page 91 ---
+
+The Kernel Trick
+▶ Akernel functionis equivalent to an inner product in some feature space,
+K(x i,x j)=𝜙(x i)T 𝜙(x j)
+▶ Don’t need to explicitly compute𝜙(x)to use the kernel trick, can form the kernel matrixK
+directly
+
+
+--- Page 92 ---
+
+The Kernel Trick
+▶ The new solution to the SVM optimization problem is:
+f(x)=
+N∑︁
+i=1
+𝛼i yi K(x i,x) +b(28)
+Optimization techniques to find𝛼i are the same as before!
+Some example kernels:
+▶ Linear:K(x i,x j)=x T
+i xj
+▶ Polynomial:K(x i,x j)=(x T
+i xj +c) d
+▶ Gaussian:K(x i,x j)=e −
+||x i −xj || 2
+2𝜎 2
+
+--- Page 93 ---
+
+Kernel Methods Everywhere
+1. Kernel methods show up in many places beyond just SVMs:
+1.1 Kernel ridge regression
+1.2 Kernel PCA
+2. The intuition learned here generalizes to many other methods: project your problem into a
+higher dimensional space to handle non-linearity
+
+--- Page 94 ---
+
+An Alternative Approach
+1. Given some kernel-based estimator:
+f(x i)=
+J∑︁
+j=1
+𝛼j yj K(x i,x j) +b(29)
+2. We can take an eigen-expansion of the kernel:
+K(x i,x j)=
+∞∑︁
+k=1
+𝛾k 𝜙k (xi)𝜙 k (xj)(30)
+3. Then can equivalently write the original estimator as:
+f(x i)=
+∞∑︁
+k=1
+𝛼k 𝜙k (xi) +b(31)
+
+--- Page 95 ---
+
+An Alternative Approach
+1. Could we work with the expanded features directly?
+ˆyt =
+∞∑︁
+k=1
+𝛼k 𝜙k (xt) ≈
+K∑︁
+k=1
+𝛼k 𝜙k (xt)(32)
+2. Random fourier features are a way to do this (will discuss more next time)
+3. Splines are also good
+4.Don’t use polynomial features!(Why?)
+
+--- Page 96 ---
+
+Regression Trees
+
+--- Page 97 ---
+
+Regression Trees
+1. We’ve seen one way to handle non-linearities and regularization, regression trees are another
+2. Arguably more interpretable than other methods
+3. Very flexible and can be used for both regression and classification
+
+--- Page 98 ---
+
+Tree Structure; “A Flowchart”
+Fully nonparametric and departs from the traditional regression approach we’ve seen up to this
+point.
+▶ “Grow” the tree in sequential steps, each step creating a new “branch” that sorts the data
+leftover from the previous step into bins based on the predictors
+▶ Sequentially branching slices predictor space into rectangular partitions
+▶ Forecast outcome in partition with average value of the outcome variable in that partition
+
+--- Page 99 ---
+
+Definition: Binary, Recursive Trees
+1.K“leaves” (terminal nodes) and depthL
+2. Prediction of tree written as:
+g(z i,t ;𝜃,K,L)=
+K∑︁
+k=1
+𝜃k1(z i,t ∈C K (L))(33)
+3.C k denotes a partition(k=1, ...,K)of the predictor space
+4. Each partition is a product of up toLindicator functions of predictors
+5.𝜃 k is associated with the prediction of the outcomes inCk
+
+--- Page 100 ---
+
+Tree Structure
+Example:
+g(z i,t ;𝜃,3,2)=𝜃 11(size i,t <0.5)1(b/m i,t <0.3)+𝜃 21(size i,t <0.5)1(b/m i,t ≥0.3)+𝜃 31(size i,t ≥0.5)
+(34)
+
+--- Page 101 ---
+
+Growing a Tree
+▶ Finding bins that best discriminate among outcomes
+▶ Find a rule (which variable? where to split?) to partition data
+▶ Split only at data realizations
+▶ Fits are typically averages or majority votes of bins
+▶ Use validation data to decide when to stop
+
+--- Page 102 ---
+
+Recursive Partitioning Algorithm (Brieman, 1984)
+▶ Start with the root,myopicallyoptimize forecast error at each new branch (Greedy but fast like
+forward stepwise regression)
+▶ Choose predictor and split value tomaximize discrepancyamong average outcomes in
+resulting bins
+▶ Loss function, called “impurity”, for a branchC:
+Impurity(𝜃,C)= 1
+|C|
+∑︁
+zi,t ∈C
+(yi,t+1 −𝜃) 2 (35)
+▶ Branching stops when tree size reaches pre-specified threshold (that can be adaptively
+validated)
+
+--- Page 103 ---
+
+Regularizing A Regression Tree
+Trees are typically deep and highly overfit!
+▶ To regularize a tree some may use early stopping and post-pruning (cut off unimportant nodes)
+▶ We’ll use ensemble methods:boostingandbagging, which gained popularity because of their
+superior performance and scalability
+
+--- Page 104 ---
+
+Boosted Trees
+Boosting: ensemble method for aggregating many individually “weak learners” (models that don’t
+forecast well) into a single “strong learner”.
+Algorithm sketch
+1. Fix tree depthL(generally shallow e.g.L=1)
+2. Fit 1st simple tree
+▶ Given limited depth will be a weak learner with high bias
+3. Fit 2nd shallow tree toresiduals from the first tree
+4. Forecasts from the two trees are aggregated to form ensemble prediction
+▶ Shrink forecast from 2nd tree by a factor of𝜂∈ (0,1)
+▶ Helps prevent the model from overfitting to residuals
+5. Iterate until total ofBtrees in the ensemble
+L,𝜂, andBare tuning parameters selected via cross-validation.
+Sometimes called gradient boosting, why is that? How does this relate to gradient descent?
+
+--- Page 105 ---
+
+Random Forests
+Bagging: ensemble method that bootstraps many datasets, fits models to each then averages their
+forecasts.
+▶ Individual trees are deep and overfit, thus inefficiently variable
+▶ Variance reduction via average overBbootstrap samples – stabilizes predictive performance
+Dropout: Variation on bagging to de-correlate bootstrap trees
+▶ If, e.g., firm size is a dominant predictor, then most bagged trees will share low-level splits on
+size, resulting in a high correlation among their predictions
+▶ Consider only a (random) subset ofMpredictors to split each branch
+▶ Enhances variance reduction compared to standard bagging
+▶ Biggest expected improvement with strong predictors AND moderately important predictors
+OR highly correlated predictors
+L,M, andBare tuning parameters selected via cross-validation.
+
+--- Page 106 ---
+
+Neural Networks
+
+--- Page 107 ---
+
+Origins of Neural Networks
+▶ Modeling the human brain:
+▶ Human brain, through billions of interactions among hundreds of millions of neurons, learns to
+solve (some) complex problems nearly instantly (like face recognition)
+▶ Mathematical model of neuron function for decision making (McCulloch and Pitts, 1943)
+▶ Early speculation about learning via neuron models
+▶ Confluence of computer science and statistics:
+▶ In conventional programming, tell computer what to do, breaking big problems into many small,
+precisely defined tasks
+▶ Statistical models are canvas upon which data paints coarse scientific pictures
+▶ Learn (estimate) from observational data, instead of requiring pre-specified logic, for decision
+making and problem solving
+
+--- Page 108 ---
+
+Why Neural Networks?
+▶ Theoretical underpinnings as "universal approximators" for any smooth predictive association
+(e.g., Hornik, 1991)
+▶ Though many other nonparametric methods can do the same.
+▶ Flexibility draws from ability to intertwine many telescoping layers of nonlinear predictor
+interactions (hence synonym "deep learning")
+▶ At the same time, their complexity ranks them least transparent, least interpretable, and most
+highly parameterized ML tools
+
+--- Page 109 ---
+
+Some Flavor
+Yann LeCun’s Q&A session on Quora
+Answer: Idothinkthatthereisaneedforbettertheoreticalunderstandingofdeeplearning.
+But if a method works, it should not be abandoned nor dismissed just because theorists
+haven’t yet figured out how to explain it. The field of machine learning made that mistake
+in the mid 1990s...
+Michael Nielsen (on neural networks)
+"I’ve painted a picture of uncertainty here, stressing that we do not yet have a solid theory
+of how [models] should be chosen.
+...On the other hand, we shouldn’t let the lack of a full theory stop us! We have powerful
+tools already at hand, and can make a lot of progress with those tools."
+
+--- Page 110 ---
+
+
+
+--- Page 111 ---
+
+Basic Model: Two Examples
+▶ Focus on traditional feed-forward networks, consisting of:
+▶ Input layerof raw predictors
+▶ Hidden layersthat interact and nonlinearly transform predictors
+▶ Output layerthat aggregates hidden layers into ultimate prediction
+▶ Fully connected
+
+--- Page 112 ---
+
+Basic Model: Two Examples
+▶ Left panel: No hidden layers = regression model
+▶ Each predictor amplified or attenuated by 5-D parameter vector ,𝜃
+▶ That is, simplest NN is linear regression
+
+--- Page 113 ---
+
+Basic Model: Two Examples
+▶ More flexible predictive associations by adding hidden layers (right panel)
+▶ Each neuron draws signals linearly from all input units (as in left panel)
+▶ Neurons apply nonlinearactivation functionfto its aggregated signal before sending its
+output to the next layer
+▶ E.g., 2nd neuron inputs⇒output:x(1)
+2 =f
+
+𝜃 (0)
+2,0 + Í4
+j=1 zj 𝜃 (0)
+2,j
+
+▶ Then, neuron output linearly aggregated into ultimate forecast:
+g(z;𝜃)=𝜃 (1)
+0 +
+5∑︁
+j=1
+x (1)
+j 𝜃 (1)
+j (36)
+▶ Thus, in this example,31=(4+1) ×5+6parameters (5 to reach each neuron, 6 to aggregate
+neurons)
+
+--- Page 114 ---
+
+Basic Model: Telescoping Formula
+▶ K (l) denotes number of neurons in each layerl=1, . . . ,L
+▶ Denote output of neuronkin layerlasx (l)
+k
+▶ Output vector for this layer (w/ a constant),x(l)
+0 , as:
+x (l) =(1,x (l)
+1 , . . . ,x (l)
+K (l) )′ (37)
+▶ Recursive output formula at each neuron in layerl>0is then:
+x (l)
+k =f
+
+x (l−1) ′
+𝜃 (l−1)
+k
+
+,(38)
+with final output:
+g(x;𝜃)=x (L−1) ′
+𝜃 (L−1) (39)
+▶ Number of parameters in each hidden layerlisK(l) (1+K (l−1) )
+▶ Plus another1+K (L−1) for the output layer
+
+--- Page 115 ---
+
+Difficult Choices
+▶ Many choices must be made regarding architecture of the NN, including:
+▶ Number of hidden layers
+▶ Number of neurons in each layer
+▶ Which units are connected
+▶ While "univ. approx." result suggests sufficiency of 1 hidden layer, deeper networks often
+achieve same accuracy with fewer parameters
+▶ Eldan and Shamir (2016) formally demonstrate that depth—even if increased by one layer
+(from 2 to 3)—can be exponentially more valuable than increasing width in standard
+feed-forward neural networks
+▶ However, deeper networks are difficult to train...
+
+--- Page 116 ---
+
+“Easy” (Standard) Choices
+▶ Common Activation Functions:
+▶ Step:
+f(x)=
+(
+0ifx−b<0
+1otherwise
+(40)
+▶ Sigmoid:
+f(x)= 1
+1+e −x (41)
+▶ Rectified linear unit (ReLU) - Preferred, sparse outputs of hidden layers, fast evaluation:
+f(x)=
+(
+0ifx<0
+xotherwise
+(42)
+▶ Usual MSE loss as objective function:
+min
+𝜃
+1
+N
+∑︁
+i
+(yi −g(x i;𝜃)) 2 (43)
+
+--- Page 117 ---
+
+(Stochastic) Gradient Descent
+▶ Gradient descent:
+𝜃t+1 =𝜃 t −𝜂 t ∇MSE(𝜃 t)(44)
+where𝜂 t >0is the learning rate:
+▶ 𝜂too big is unstable,𝜂too small is too slow
+▶ "Backpropagation":
+▶ Crucial algorithm for calculating gradient
+▶ Essentially uses a version of chain rule for more efficient computation
+▶ "Mini-batches":
+▶ Because datasets are typically huge, full descent routine too slow
+▶ Rather than calculating: ∇MSE=∇ 1
+N
+∑︁
+i
+(yi −g(x i ;𝜃)) 2 (45)
+▶ Calculate for random subsetm:
+∇MSEm =∇ 1
+Nm
+∑︁
+i∈m
+(yi −g(x i ;𝜃)) 2 (46)
+▶ Cycle through subsets (without replacement). A single pass through the entire training sample is
+called an "epoch."
+
+--- Page 118 ---
+
+Optimization “Tricks”
+▶ Learning-rate decay:
+▶ Algorithms to shrink learning rate toward zero as gradient approaches zero
+▶ 𝜂can be adaptive for individual parameters
+▶ 𝜂is one of the most difficult to set hyperparameters!
+▶ Modern algorithms also incorporate momentum, Nesterov acceleration, e.g., "Adam" (Kingma
+and Ba, 2015, ICLR)
+▶ Cited: 10,624 as of last week
+▶ Improving NN algorithms is continuously and intensively researched!
+▶ "Dropout" (Srivastava et al., 2014, JMLR):
+▶ Cited: 7,065 as of last week
+▶ "Batch Normalization" (Ioffe and Szegedy, 2015, ICML):
+▶ Cited: 5,519 as of last week
+▶ These algorithms are very specific to training deep neural networks, and their theoretical
+justification is ongoing, hence omitting the details
+
+--- Page 119 ---
+
+Regularization “Tricks”
+▶ L1 andL 2 penalization
+▶ Ensemble methods: randomness in SGD, parameter initialization, etc.
+▶ “Early stopping”:
+▶ Anotheroptimizationtrick: endingtheparametersearchearlybymonitoringthelossfunctioninthe
+validation sample
+▶ Parameter estimates are shrunken towards the initial guess, and this is how early stopping
+regularizes against overfit
+
+
+--- Page 120 ---
+
+Simulation Comparison
+
+--- Page 121 ---
+
+Simulation Design
+▶ Simulate a (latent) 3–factor model for excess returnsrt+1, fort=1,2, . . . ,T=180,
+i=1,2, . . . ,N=200:
+ri,t+1 =g(z i,t ) +e i,t+1 ,e i,t+1 =𝛽 ′
+i,t vt+1 +𝜀 i,t+1 ,
+zi,t =(1,y t)′ ⊗c i,t , 𝛽 i,t =(c i1,t ,c i2,t ,c i3,t ),
+▶ Choosev t+1 ∼N(0,0.052×I 3), and𝜀 i,t+1 ∼t 5(0,0.052), where their variances are calibrated
+so that the average time seriesR2 is 50% and the average volatility is 30%.
+▶ Simulate the panel of characteristics for each1≤i≤Nand each1≤j≤3from the following
+model:
+cij,t = 2
+n+1 rank(¯cij,t ) −1, ¯cij,t =𝜌 j¯cij,t−1 +𝜀 ij,t ,
+where𝜌 j ∼U[0.9,1], and𝜀 ij,t ∼N(0,1).
+
+--- Page 122 ---
+
+Simulation Design
+▶ Similarly, simulateyt from the following model:
+yt =𝜌y t−1 +u t,
+whereu t ∼N(0,1−𝜌 2)and𝜌=0.95.
+▶ Consider two cases ofg(·)functions:
+(a)g(z i,t )=(c i1,t ,c i2,t ,c i3,t ×y t )′𝜃0,
+(b)g(z i,t )=
+
+c2
+i1,t ,c i1,t ×c i2,t ,sgn(c i3,t ×y t )
+ ′
+𝜃0.
+▶ Calibratethevaluesof𝜃 0 suchthatthecross-sectionalR 2 isaround25%,andthepredictiveR 2
+is 5-6%.
+
+--- Page 123 ---
+
+Comparison of PredictiveR2 for ML Algos
+
+
+--- Page 124 ---
+
+Comparison Over Alternative Horizons
+
+
+--- Page 125 ---
+
+Comparison Over Alternative Horizons
+
+
+--- Page 126 ---
+
+Comparison of Average Variable Selection Frequencies
+
+
+--- Page 127 ---
+
+Comparison of Average Variable Selection Frequencies
+
+
+--- Page 128 ---
+
+Comparison of Average Variable Selection Frequencies
+
+
+--- Page 129 ---
+
+Comparison of Average Variable Selection Frequencies

@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+Data/Game Data/nba.sqlite
+Data/Game Data/play_by_play.csv

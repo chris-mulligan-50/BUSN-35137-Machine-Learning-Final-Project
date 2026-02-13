@@ -1,0 +1,1506 @@
+
+
+--- Page 1 ---
+
+Machine Learning in Finance
+Lecture 4: A Crash Course in Unsupervised Learning
+J. Leland Bybee (University of Chicago)
+February 2, 2026
+
+--- Page 2 ---
+
+Odds & Ends
+▶ Project proposals due today!
+▶ Questions?
+
+--- Page 3 ---
+
+Unsupervised Learning
+1.Discover structure:
+GivenX 1, ...,X n, find some structure/groups in the data.
+
+--- Page 4 ---
+
+Unsupervised Learning
+
+
+--- Page 5 ---
+
+Unsupervised Learning
+
+
+--- Page 6 ---
+
+Unsupervised Learning
+
+
+--- Page 7 ---
+
+Unsupervised Learning
+
+
+--- Page 8 ---
+
+Outline
+1. Clustering
+▶ K-means (& K-Medoids)
+▶ Hierarchical clustering
+2. Model-based methods
+▶ Gaussian mixture models (GMM)
+▶ Expectation Maximization (EM)
+▶ Latent Dirichlet Allocation (LDA)
+▶ Bayesian methods/Gibbs sampling
+3. Dimension reduction
+▶ Principal Component Analysis (PCA)
+▶ Alternating Least Squares (ALS)
+4. Non-linear dimension reduction
+▶ Multidimensional Scaling (MDS)
+▶ Isomap
+▶ Local Linear Embedding (LLE)
+▶ Kernel PCA
+▶ Autoencoders
+
+--- Page 9 ---
+
+Clustering
+
+--- Page 10 ---
+
+Clustering
+Clustering: task of dividing up data into groups (clusters), so that points in any one group are more
+“similar” to each other than to points outside the group Why cluster? Two main uses
+▶ Summary: deriving a reduced representation of the full data set. E.g., vector quantization
+(we’ll see this shortly)
+▶ Discovery: looking for new insights into the structure of the data. E.g., finding groups of
+students that commit similar mistakes, or groups of 80s songs that sound alike
+▶ Helping with prediction, i.e., in classification or regression
+
+--- Page 11 ---
+
+Clustering
+Inferred meaning of clusters: black – fastball, red – sinker, green – change up, blue – slider, light
+blue – curveball
+
+--- Page 12 ---
+
+Clustering vs. Classification
+In classification, we have data for which the groups are known, and we try to learn what
+differentiates these groups (i.e., classification function) to properly classify future data
+In clustering, we look at data for which groups are unknown and undefined,and try to learn the
+groups themselves, as well as what differentiates them
+
+
+--- Page 13 ---
+
+Dissimilarity
+Given observationsX1, . . . ,X n, and dissimilaritiesd(Xi,X j). (E.g., think ofXi ∈R p and
+d(X i,X j)=∥X i −X j ∥2
+2) LetKbe the number of clusters (fixed). A clustering of points,X1, . . . ,X n
+is a functionCthat assigns each observationXi to a groupk∈ {1, . . . ,K}Notation:C(i)=k
+means thatXi is assigned to groupk, andnkis the number of points in the groupk. Also, let
+dij =d(X i,X j)The within-cluster scatter is defined as
+W= 1
+2
+K∑︁
+k=1
+1
+nk
+∑︁
+C(i)=k,C(j)=k
+dij
+SmallerWis better
+
+--- Page 14 ---
+
+K-means
+TheK-means clustering algorithm approximately minimizes the enlarged criterion by alternately
+minimizingoverCandc 1, . . . ,c K Westartwithaninitialguessforc 1, . . . ,c K (e.g.,pickKpointsat
+random over the range ofX1, . . . ,X n), then repeat:
+1. Minimize overC: for eachi=1, . . . ,n, find the cluster center
+ck closest toXi, and letC(i)=k
+2. Minimize overc1, . . . ,c K: for eachk=1, . . . ,K, letc k = ¯Xk,
+the average of points in groupk
+Stop when within-cluster variation doesn’t change In words:
+1. Cluster (label) each point based on the closest center
+2. Replace each center by the average of points in its cluster
+
+--- Page 15 ---
+
+K-means
+
+
+--- Page 16 ---
+
+K-means Properties
+▶ Within-cluster variation decreases with each iteration of the algorithm. I.e., ifWt is the
+within-cluster variation at iterationt, thenWt+1 ≤W t
+▶ The algorithm always converges, no matter the initial cluster centers. In fact, it takes≤Kn
+iterations
+▶ The final clustering depends on the initial cluster centers. Sometimes, different initial centers
+lead to very different final outputs. So we typically runK-means multiple times (e.g., 10
+times), randomly initializing cluster centers for each run, then choose among from collection
+of centers based on which one gives the smallest within-cluster variation
+▶ The algorithm is not guaranteed to deliver the clustering that globally minimizes within-cluster
+variation (recall: this would require looking through all possible assignments!)
+
+--- Page 17 ---
+
+K-means Example
+HereX i ∈R 2,n=250, andK=4, the points are not as well-separated
+These are results of running theK-means algorithm with different initial centers (chosen randomly
+over the range of theXi’s).
+We choose the second collection of centers because it yields the smallest within-cluster variation
+
+--- Page 18 ---
+
+Clustering as Compression
+Left: original image; middle: using 23.9% of the storage; right: using 6.25% of the storage
+K-means is often called “Lloyd’s algorithm” in computer science and engineering, and is used in
+vector quantization for compression
+Basic idea: runK-means clustering on4×4squares of pixels in an image, and keep only the
+clusters and labels. SmallerKmeans more compression
+
+--- Page 19 ---
+
+K-medoids
+In some applications we want each center to be one of the points itself. This is whereK-medoids
+comes in—an algorithm similar to theK-means algorithm, except when fitting the centers
+c1, . . . ,c K, we restrict our attention to the points themselves Initial guess for centersc1, . . . ,c K
+(e.g., randomly selectKof the pointsX1, . . . ,X n), then repeat:
+1. Minimize overC: for eachi=1, . . . ,n, find the cluster centerck closest toXi, and letC(i)=k
+2. Minimize overc1, . . . ,c K: for eachk=1, . . . ,K, letc k =X ∗
+k, themedoidof points in cluster
+k, i.e., the pointXi in clusterkthat minimizes Í
+C(j)=k ∥Xj −X i ∥2
+2
+Stop when within-cluster variation doesn’t change In words:
+1. Cluster (label) each point based on the closest center
+2. Replace each center by the medoid of points in its cluster
+
+--- Page 20 ---
+
+K-medoids
+
+
+--- Page 21 ---
+
+K-medoids Properties
+▶ TheK-medoids algorithm shares the properties ofK-means that we discussed (each iteration
+decreases the criterion; the algorithm always converges; different starts gives different final
+answers; it does not achieve the global minimum)K-medoids generally returns a higher value
+of
+K∑︁
+k=1
+∑︁
+C(i)=k
+∥Xi −c k ∥2
+2
+than doesK-means (why?). Also,K-medoids is computationally harder thanK-means
+(because of step 2: computing the medoid is harder than computing the average)
+▶ Remember,K-medoids has the (potentially important) property that the centers are located
+among the data points themselves
+
+--- Page 22 ---
+
+Hierarchical Clustering
+Recall two properties ofK-means (K-medoids) clustering:
+1. It fits exactlyKclusters (as specified)
+2. Final clustering assignment depends on the chosen initial cluster centers
+Given pairwise dissimilaritiesdij between data points, hierarchical clustering produces a consistent
+result, without the need to choose initial starting positions (number of clusters) The catch: we need
+to choose a way to measure the dissimilarity between groups, called the linkage Given the linkage,
+hierarchical clustering produces a sequence of clustering assignments. At one end, all points are in
+their own cluster, at the other end, all points are in one cluster
+
+--- Page 23 ---
+
+Hierarchical Clustering
+Two types of hierarchical clustering algorithms:
+Agglomerative (i.e., bottom-up):
+▶ Start with all points in their own group
+▶ Until there is only one cluster, repeatedly: merge the two groups that have the smallest
+dissimilarity
+Divisive (i.e., top-down):
+▶ Start with all points in one cluster
+▶ Until all points are in their own cluster, repeatedly: split the group into two resulting in the
+biggest dissimilarity
+Agglomerative strategies are simpler, we’ll focus on them. Divisive methods are still important, but
+we won’t be able to cover them today
+
+--- Page 24 ---
+
+Hierarchical Clustering (Example)
+Given these data points, an agglomerative algorithm might decide on a clustering sequence as
+follows:
+
+
+--- Page 25 ---
+
+Hierarchical Clustering (Example)
+Can represent this as a dendrogram (natural representation of the hierarchy)
+
+
+--- Page 26 ---
+
+Dendrograms
+Dendrogram: convenient graphic to display a hierarchical sequence of clustering assignments. This
+is simply a tree where:
+▶ Each node represents a group
+▶ Each leaf node is a singleton (i.e., a group containing a single data point)
+▶ Root node is the group containing the whole data set
+▶ Each internal node has two daughter nodes (children), representing the the groups that were
+merged to form it
+Remember: the choice of linkage determines how we measure dissimilarity between groups of
+points
+If we fix the leaf nodes at height zero, then each internal node is drawn at a height proportional to
+the dissimilarity between its two daughter nodes
+
+--- Page 27 ---
+
+Linkages
+Given pointsX1, . . . ,X n, and dissimilaritiesdij between each pairXi andX j. (Think ofXi ∈R p and
+dij =∥X i −X j ∥2; note: this is distance, not squared distance)
+At any level, clustering assignments can be expressed by setsG={i1,i 2, . . . ,i r }, giving indices of
+points in this group. LetnG be the size ofG(herenG =r). Bottom level: each group looks like
+G={i}, top level: only one group,G={1, . . . ,n}
+Linkage: functiond(G,H)that takes two groupsG,Hand returns a dissimilarity score between
+them
+Agglomerative clustering, given the linkage:
+▶ Start with all points in their own group
+▶ Until there is only one cluster, repeatedly: merge the two groupsG,Hsuch thatd(G,H)is
+smallest
+
+--- Page 28 ---
+
+Linkages
+We’ll see the following linkages today:
+1. Single linkage
+2. Complete linkage
+3. Average linkage
+4. Centroid linkage
+5. Minimax linkage
+
+--- Page 29 ---
+
+Single Linkage
+In single linkage (i.e., nearest-neighbor linkage), the dissimilarity betweenG,His the smallest
+dissimilarity between two points in opposite groups:
+dsingle (G,H)=min
+i∈G,j∈H
+dij
+Example (dissimilaritiesd ij are distances, groups
+are marked by colors): single linkage score
+dsingle (G,H)is the distance of the closest pair
+
+
+--- Page 30 ---
+
+Single Linkage
+Heren=60,X i ∈R 2,d ij =∥X i −X j ∥2. Cutting the tree ath=0.9gives the clustering assignments
+marked by colors
+Cut interpretation: for each pointXi, there is another pointXj in its cluster withdij ≤0.9
+
+--- Page 31 ---
+
+Complete Linkage
+In complete linkage (i.e., furthest-neighbor linkage), dissimilarity betweenG,His the largest
+dissimilarity between two points in opposite groups:
+dcomplete (G,H)=max
+i∈G,j∈H
+dij
+Example (dissimilaritiesdij are distances, groups are
+marked by colors): complete linkage score
+dcomplete (G,H)is the distance of the furthest pair
+
+
+--- Page 32 ---
+
+Complete Linkage
+Same data as before. Cutting the tree ath=5gives the clustering assignments marked by colors
+Cut interpretation: for each pointXi, every other pointXj in its cluster satisfiesdij ≤5
+
+--- Page 33 ---
+
+Average Linkage
+In average linkage, the dissimilarity betweenG,His the average dissimilarity over all points in
+opposite groups:
+daverage(G,H)= 1
+nG ·n H
+∑︁
+i∈G,j∈H
+dij
+Example (dissimilaritiesdij are distances, groups are
+marked by colors): average linkage scoredaverage(G,H)
+is the average distance across all pairs
+(Plot here only shows distances between the blue points
+and one red point)
+
+
+--- Page 34 ---
+
+Average Linkage
+Same data as before. Cutting the tree ath=1.5gives clustering assignments marked by the colors
+Cut interpretation: there really isn’t a good one!
+
+--- Page 35 ---
+
+Shortcomings of Single & Complete Linkages
+Single and complete linkage can have some practical problems:
+▶ Single linkagesuffers from chaining. In order to merge two groups, only need one pair of
+points to be close, irrespective of all others. Therefore clusters can be too spread out, and not
+compact enough
+▶ Complete linkageavoids chaining, but suffers from crowding. Because its score is based on
+the worst-case dissimilarity between pairs, a point can be closer to points in other clusters than
+to points in its own cluster. Clusters are compact, but not far enough apart
+Average linkagetries to strike a balance. It uses average pairwise dissimilarity, so clusters tend to
+be relatively compact and relatively far apart
+
+--- Page 36 ---
+
+Shortcoming of Single & Complete Linkages
+
+
+--- Page 37 ---
+
+Shortcomings of Average Linkage
+Average linkage isn’t perfect, it has its own problems:
+▶ It is not clear what properties the resulting clusters have when we cut an average linkage tree at
+given heighth. Single and complete linkage trees each had simple interpretations
+▶ Results of average linkage clustering can change with a monotone increasing transformation of
+dissimilaritiesd ij. I.e., ifhis such thath(x) ≤h(y)wheneverx≤y, and we used
+dissimilaritiesh(d ij)instead ofd ij, then we could get different answers
+Depending on the context, second problem may be important or unimportant. E.g., it could be very
+clear what dissimilarities should be used, or not
+Note:results of single, complete linkage clustering are unchanged under monotone transformations
+
+--- Page 38 ---
+
+Shortcomings of Average Linkage
+
+
+--- Page 39 ---
+
+Centroid Linkage
+Centroid linkage is commonly used. Assume thatXi ∈R p, anddij =∥X i −X j ∥2. Let ¯XG, ¯XH denote
+group averages forG,H.
+Then:
+dcentroid (G,H)=∥ ¯XG − ¯XH ∥2
+Example (dissimilaritiesdij are distances, groups are marked
+by colors): centroid linkage scoredcentroid (G,H)is the
+distance between the group centroids (i.e., group averages)
+
+
+--- Page 40 ---
+
+Centroid Linkage
+Heren=60,X i ∈R 2,d ij =∥X i −X j ∥2. Cutting the tree at some heights wouldn’t make sense
+...because the dendrogram has inversions! But we can, e.g., still look at output with 3 clusters
+Cut interpretation: there isn’t one, even with no inversions
+
+--- Page 41 ---
+
+Shortcomings of Centroid Linkage
+▶ Can produce dendrograms with inversions, which really messes up the visualization
+▶ Even if we were lucky enough to have no inversions, still no interpretation for the clusters
+resulting from cutting the tree
+▶ Answers change with a monotone transformation of the dissimilarity measuredij =∥X i −X j ∥2.
+E.g., changing todij =∥X i −X j ∥2
+2 would give a different clustering
+
+
+--- Page 42 ---
+
+Minimax Linkage
+Minimax linkage is a newcomer. First define radius of a group of pointsGaroundXi as
+r(X i,G)=max
+j∈G
+dij
+Then:
+dminimax (G,H)=min
+i∈G∪H
+r(X i,G∪H)
+Example (dissimilaritiesdij are distances, groups marked by
+colors): minimax linkage scoredminimax (G,H)is the
+smallest radius encompassing all points inGandH. The
+centerX c is the black point
+
+
+--- Page 43 ---
+
+Minimax Linkage
+Same data as before. Cutting the tree ath=2.5gives clustering assignments marked by the colors
+Cut interpretation: each pointXi belongs to a cluster whose centerXc satisfiesd ic ≤2.5
+
+--- Page 44 ---
+
+Properties of Minimax Linkage
+▶ Cutting a minimax tree at a heightha nice interpretation: each point is≤hin dissimilarity to
+the center of its cluster.
+▶ Produces dendrograms with no inversions
+▶ Unchanged by monotone transformation of dissimilaritiesdij
+▶ Producesclusterswhosecentersarechosenamongthedatapointsthemselves. Rememberthat,
+depending on the application, this can be a very important property.
+(HenceminimaxclusteringistheanalogytoK-medoidsintheworldofhierarchicalclustering)
+
+--- Page 45 ---
+
+Linkages summary
+Note:this doesn’t tell us what “best linkage” is
+What’s missing here: a detailed empirical comparison of how they perform. On top of this,
+remember that choosing a linkage can be very situation dependent
+
+--- Page 46 ---
+
+Model-Based Methods
+
+--- Page 47 ---
+
+Mixture Models
+▶ We explored the use ofK-meansandhierarchical clusteringfor clustering.
+▶ These methods yieldhardassignments, strictly assigning observations to only one cluster.
+▶ What aboutsoftassignments? Allow for someuncertaintyin the clustering results.
+▶ Welcome to the wonderful world ofmixture models.
+
+
+--- Page 48 ---
+
+Mixture Models
+We assume the distributionf(x)is amixtureofKcomponentdistributions:
+f(x)=
+K∑︁
+k=1
+𝜋kfk (x)
+▶ 𝜋k:mixing proportions (or weights), where𝜋k >0and Í
+k 𝜋k =1
+This defines adata generating process, meaning to generate a new point:
+1.Pick a distribution / componentamong ourKoptions, by introducing a new variable:
+z∼Multinomial(𝜋 1, 𝜋2, . . . , 𝜋K )
+i.e., a categorical variable indicating which group the new point is from.
+2.Generate an observation with that distribution / component, i.e.,
+x|z∼f z
+So what do we use for eachfk?
+
+--- Page 49 ---
+
+Gaussian Mixture Models (GMMs)
+Assume aparametric mixture model, withparameters𝜃k for thekth component:
+f(x)=
+K∑︁
+k=1
+𝜋kfk (x;𝜃 k)
+Assume each component isGaussian / Normal. In the 1D case:
+fk (x;𝜃 k)=N(x;𝜇 k, 𝜎2
+k )= 1√︃
+2𝜋𝜎 2
+k
+exp
+ 
+− (x−𝜇 k)2
+2𝜎2
+k
+!
+We need to estimate each of the following:
+𝜋1, . . . , 𝜋K , 𝜇 1, . . . , 𝜇K , 𝜎 2
+1 , . . . , 𝜎2
+K
+
+--- Page 50 ---
+
+Let’s Pretend We Only Have One Component...
+IfwehavenobservationsfromasingleNormaldistribution,weestimatethedistributionparameters
+using thelikelihood function, the probability/density of observing the data given the parameters:
+L (𝜇, 𝜎|x 1, . . . ,x n)=f(x 1, . . . ,x n |𝜇, 𝜎)=
+nÖ
+i=1
+1√
+2𝜋𝜎 2
+exp
+
+− (xi −𝜇) 2
+2𝜎2
+
+We can compute themaximum likelihood estimates (MLEs)for𝜇and𝜎. You already know these
+values!
+▶ ˆ𝜇MLE = 1
+n
+Ín
+i=1 xi (sample mean)
+▶ ˆ𝜎MLE =
+√︃
+1
+n
+Ín
+i=1 (xi −𝜇) 2 (sample standard deviation, plug inˆ𝜇MLE)
+
+--- Page 51 ---
+
+The Problem with More Than One Component
+▶ We don’t know which component an
+observation belongs to.
+▶ If we did know, we could compute each
+component’s MLEs as before.
+▶ But we don’t know becausezis alatent
+variable! So what about its distribution
+given the data?
+P(z i =k|x i)= P(x i |z i =k)P(z i =k)
+P(x i)
+=
+𝜋kN(𝜇 k, 𝜎2
+k )
+ÍK
+k=1 𝜋kN(𝜇 k, 𝜎2
+k )
+▶ But we do NOT know these parameters!
+▶ This leads to a very useful algorithm in
+statistics...
+
+
+--- Page 52 ---
+
+Expectation-Maximization (EM) Algorithm
+We alternate between the following steps:
+▶ Pretendingto know the probability each observation belongs to each group, to estimate the
+parameters of the components.
+▶ Pretendingto know the parameters of the components, to estimate the probability each
+observation belongs to each group.
+This approach is reminiscent of the K-means algorithm.
+
+--- Page 53 ---
+
+Expectation-Maximization (EM) Algorithm
+1. Initialization: Start with initial guesses for the parameters:
+▶ Mixing proportions:𝜋 1, . . . , 𝜋K
+▶ Means:𝜇 1, . . . , 𝜇K
+▶ Variances:𝜎 2
+1 , . . . , 𝜎2
+K
+2. Repeat until convergence:
+▶ Expectation (E) step:
+ˆzik =
+𝜋k ·N(x i;𝜇 k, 𝜎2
+k )
+ÍK
+j=1 𝜋j ·N(x i;𝜇 j, 𝜎2
+j )
+▶ Maximization (M) step:
+𝜇k =
+Ín
+i=1 ˆzikxi
+Ín
+i=1 ˆzik
+, 𝜎 2
+k =
+Ín
+i=1 ˆzik (xi −𝜇 k)2
+Ín
+i=1 ˆzik
+, 𝜋 k = 1
+n
+n∑︁
+i=1
+ˆzik
+We’ve already seen this pattern (K-means, IPCA), we’ll continue to see it in the future.
+
+--- Page 54 ---
+
+How Does This Relate Back to Clustering?
+From the EM algorithm:
+▶ ˆzik is asoft membershipof observationiin clusterk.
+▶ You can assign observationito a cluster with the largestˆzik.
+▶ Measure cluster assignmentuncertainty:1−max k ˆzik.
+Our parameters determine the type of clusters:
+▶ In 1D, we have two options:
+1. Each cluster hasequal variance(spread):𝜎 2
+1 =𝜎 2
+2 =· · ·=𝜎 2
+K.
+2. Each cluster is allowed to have adifferent variance.
+▶ But that is only 1D... what happens in multiple dimensions?
+
+--- Page 55 ---
+
+Multivariate Gaussian Mixture Models (GMMs)
+Assume a parametric mixture model with parameters𝜃k for thekth component:
+f(x)=
+K∑︁
+k=1
+𝜋kfk (x;𝜃 k)
+wheref k (x;𝜃 k) ∼N(µ k,𝚺 k).
+Each component is a multivariate normal distribution:
+▶ µk: vector of means inpdimensions
+▶ 𝚺k:p×pcovariance matrix, describing the joint variability between pairs of variables
+Covariance matrix example:
+𝚺=
+
+𝜎2
+1 𝜎1,2 · · ·𝜎 1,p
+𝜎2,1 𝜎2
+2 · · ·𝜎 2,p
+... ... . . . ...
+𝜎p,1 𝜎p,2 · · ·𝜎 2
+p
+
+
+--- Page 56 ---
+
+Multivariate Gaussian Mixture Models (GMMs)
+
+
+--- Page 57 ---
+
+Covariance Constraints
+▶ As we increase the number of dimensions, model fitting and estimation become increasingly
+difficult.
+▶ We can useconstraintson multiple aspects of thekcovariance matrices:
+▶ Volume: size of the clusters, i.e., number of observations.
+▶ Shape: direction of variance, i.e., which variables display more variance.
+▶ Orientation: aligned with axes (low covariance) versus tilted (due to relationships between
+variables).
+
+--- Page 58 ---
+
+K-Means & GMM
+▶ It’s worth noting that there is a deep link between K-means and GMM
+(K-means is a special case of GMM):
+▶ All prior class proportions are 1/K
+▶ Equal volume, only circles (Σ =𝜎2I)
+▶ All posterior probabilities are either 0 or 1
+
+--- Page 59 ---
+
+Topic Models
+
+
+--- Page 60 ---
+
+Topic Models
+Motivating questions:
+▶ What are the topics that a document is about?
+▶ Given one document, can we find other documents about the same topics?
+▶ How do topics in a field change over time?
+A hierarchical Bayesian approach:
+▶ Assume each document defines a distribution over(hidden) topics.
+▶ Assume each topic defines a distribution overwords.
+▶ The posterior probability of these latent variables given a document collection determines a
+hidden decomposition of the collection into topics.
+
+--- Page 61 ---
+
+Setting Up a Generative Model
+▶ We haveDdocuments using a vocabulary ofVword types.
+▶ Each document contains up toNword tokens.
+▶ We assumeKtopics.
+▶ Each document has aK-dimensional multinomial𝜃d over topics with a common Dirichlet
+prior Dir(𝛼).
+▶ Each topic has aV-dimensional multinomial𝜙k over words with a common symmetric
+Dirichlet prior Dir(𝛽).
+
+--- Page 62 ---
+
+The Generative Process
+For each topick=1, . . . ,K:
+▶ Draw a multinomial over words:𝜙k ∼Dir(𝛽)
+For each documentd=1, . . . ,D:
+▶ Draw a multinomial over topics:𝜃d ∼Dir(𝛼)
+▶ For each wordwd,n in the document:
+▶ Draw a topic assignment:zd,n ∼Multinomial(𝜃 d )
+▶ Draw a word:wd,n ∼Multinomial(𝜙 zd,n )
+
+--- Page 63 ---
+
+The Generative Process
+
+
+--- Page 64 ---
+
+The Generative Process
+
+
+--- Page 65 ---
+
+The Generative Process
+
+
+--- Page 66 ---
+
+A Geometric Interpretation
+
+
+--- Page 67 ---
+
+The Inference Problem
+What is the posterior of the hidden variables given the observed variables (and hyperparameters)?
+Problem:The integral in the denominator is intractable!
+Solutions:Approximate inference
+▶ Gibbs sampling (Griffiths & Steyvers)
+▶ Variational Inference (Blei et al.)
+
+--- Page 68 ---
+
+Gibbs Sampling
+▶ Gibbs sampling is much easier to understand (and often works better than variational
+inference...)
+▶ Represent the corpus as a matrix consisting of 3 columns
+▶ word assignments (i.e. which word in the vocab is this particular realization assigned to),wi
+▶ documnet assignments (i.e. which document is this particular realization assigned to),di
+▶ topic assignments (i.e. which topic is this particular realization assigned to),zi
+▶ Words and documents are observed, but topics are latent and we need to estimate...
+▶ Gibbs sampling iterates through this matrix samplingzis
+
+--- Page 69 ---
+
+Gibbs Sampling
+The probabilityP(z i =j|z −i ,w,d)is proportional to the probability ofwi under topicjtimes the
+probability of topicjgiven documentdi.
+Definen −i,j (wi)as freq. ofw i labeled as topicj.
+Definen −i,j (di)as number of words indi labeled as topicj.
+P(z i =j|z −i ,w,d) ∝
+n−i,j (wi) +𝜂
+V𝜂+ ÍV
+v=1 n−i,j (wv )
+|                     {z                     }
+Prob ofwi under topiczi
+n−i,j (di) +𝛼
+K𝛼+ ÍK
+k=1 n−i,j (di)
+|                    {z                    }
+Prob of topiczi in documentdi
+
+--- Page 70 ---
+
+What Other Quantities do we Need?
+As Bayesians, we want to compute the expected value of the parameters given the observed data.
+Our data is the set of wordsw1:D,1:N.
+Hence, we need to computeE[. . .|w1:D,1:N ]
+The topic probabilityof the wordvaccording to topick:
+⟨𝛽k,v ⟩=E[𝛽 k,v |w 1:D,1:N ]
+The topic proportions of each documentd:
+⟨𝜃d,k ⟩=E[𝜃 d,k |w 1:D,1:N ]
+The topic assignment of each wordwd,n:
+⟨zd,n,k ⟩=E[Z d,n =k|w 1:D,1:N ]
+
+--- Page 71 ---
+
+What Other Quantities do we Need?
+From any single sample, we can estimate:
+The topic probabilityof the wordvaccording to topick:
+⟨𝛽k,v ⟩=E[𝛽 k,v |w 1:D,1:N ]
+The topic proportions of each documentd:
+⟨𝜃d,k ⟩=E[𝜃 d,k |w 1:D,1:N ]
+⟨𝛽k,i ⟩=
+nj (wi) +𝜂
+V𝜂+ ÍV
+v=1 nj (wv )
+⟨𝜃d,k ⟩=
+nj (di) +𝛼
+K𝛼+ ÍK
+k=1 nj (di)
+
+--- Page 72 ---
+
+Author Topic Model
+Can allow latent topics to vary with authors (Rosen-Zvi et al, 2012)...
+
+
+--- Page 73 ---
+
+Dynamic Topic Model
+Can allow latent topics to evolve over time (Blei & Lafferty, 2006)...
+
+
+--- Page 74 ---
+
+Dimension Reduction
+
+--- Page 75 ---
+
+Clustering & Dimension Reduction
+▶ We’ve thought about clustering observations, given features. But in many situations, we can
+actually cluster the observations or the features or both. g.g.,
+▶ (From Makretsov et al. (2004), “Hierarchical clustering analysis of tissue microarray immunostaining
+data identifies prognostically significant groups of breast carcinoma”)
+▶ If we cluster the features usingK-means or hierarchical clustering, then we could replace the features by
+cluster centers. This would reduce the dimension of our feature space
+
+--- Page 76 ---
+
+What is Dimension Reduction?
+▶ Dimension reduction: the task of transforming our data set to one with less features. A new
+feature can be one of the old features, or it can be a some linear or nonlinear combination of
+old features.
+We want this transformation to preserve the main structure that is present in the feature space.
+▶ This is a broader goal than that of clustering. It is often the first step in an analysis, to be
+followed by, e.g., visualization, clustering, regression, classification.
+▶ We’re going to start with linear dimension reduction. This means: looking for straight lines in
+the feature space along which the data exhibit an interesting trend.
+▶ Specifically, we’re going to interpret “interesting” to mean high variance.
+
+--- Page 77 ---
+
+Principal Component Analysis (PCA)
+▶ Principal component analysis (PCA) is nearly as old as statistics itself. Because it has been
+widely studied, you will hear it being called different things in different fields.
+▶ WearegivenadatamatrixX∈R n×p, meaningthatwehavenobservations(rowvectors)andp
+features (column vectors). We assume that the columns ofXhave been centered. (Is this going
+to change the structure that we’re interested in?)
+
+
+--- Page 78 ---
+
+First PC
+The first principal component direction ofXis the unit vectorv1 ∈R p that maximizes the sample
+variance ofXv1 ∈R n when compared to all other unit vectors.
+For anyv∈R p, the vectorXv∈R n has sample mean zero and sample variance
+1
+n (Xv) T (Xv)(recall that we column centeredX).
+Hence the first principal component directionv1 ∈R p is
+v1 =arg max
+∥v∥ 2=1
+(Xv) T (Xv)
+The vectorXv1 ∈R n is called the first principal component ofX, andu1 =(Xv 1)/d1 ∈R n is the
+normalized first principal component. Hered1 =
+√︁
+(Xv1)T (Xv1), andd 2
+1 /nis the amount of
+variance explained byv1.
+
+--- Page 79 ---
+
+What’s Next?
+What happens next? The idea is to successively find orthogonal directions of the highest variance.
+Why orthogonal? Because we’ve already explained the variance inXalongv1, and now we want to
+look at variance in a different direction. Any direction not orthogonal tov1 would necessarily have
+some overlap withv1, i.e., it would create some redundancy in explaining the variance inX.
+
+--- Page 80 ---
+
+Second PC
+Given the first principal component directionv1 ∈R p, we define the second principal component
+directionv 2 ∈R p to be the unit vector, withvT
+2 v1 =0, that makesXv2 ∈R n have maximal sample
+variance over all unit vectors orthogonal tov1. This is
+v2 =arg max
+∥v∥ 2=1
+v T v1=0
+(Xv) T (Xv)
+The vectorXv2 ∈R n is called the second principal component ofX, andu2 =(Xv 2)/d2 ∈R n is the
+normalized second principal component. Hered2 =
+√︁
+(Xv2)T (Xv2), andd 2
+2 /nis the amount of
+variance explained byv2.
+
+--- Page 81 ---
+
+Further PCs
+Giventhek−1principalcomponentdirectionsv 1, . . . ,v k−1 ∈R p (notethat theseareorthonormal),
+we define thekth principal component directionvk ∈R p to be
+vk =arg max
+∥v∥ 2=1
+v T vj =0,j=1,...,k−1
+(Xv) T (Xv)
+The vectorXvk ∈R n is called thekth principal component ofX, anduk =(Xv k)/dk ∈R n is the
+normalizedkth principal component. Heredk =
+√︁
+(Xvk)T (Xvk), andd 2
+k /nis the amount of
+variance explained byvk.
+
+--- Page 82 ---
+
+Example
+Example:X∈R 2000×3. Shown are the three principal component directionsv1,v 2,v 3 ∈R 3, and
+the scores from projecting onto the first two directions.
+
+
+--- Page 83 ---
+
+Example
+Same example:X∈R 2000×3,v 1,v 2, . . . ,v 3 ∈R 3. What happens if we replaceXby its projection
+ontov 1? Ontov 1,v 2? Ontov 1,v 2,v 3?
+The third plot looks exactly the same as the original data. Is this a coincidence? No! (Why?)
+
+--- Page 84 ---
+
+Dimension Reduction via PCA
+As we’ve seen, dimension reduction via principal component analysis can be achieved by taking the
+firstkprincipal component scoresXv 1, . . . ,Xv k ∈R n
+We can think ofXv1, . . . ,Xv k as our new feature vectors, which is a big savings ifk≪p(e.g.k=2
+or3)
+An important question: how good are these features at capturing the structure of our old features?
+How good are they, for a fixedk?
+
+--- Page 85 ---
+
+Approximation by Projection
+As for the first question, think about approximatingXbyXVkV T
+k , the projection ofXonto the firstk
+principal component directions
+An important alternate characterization of the principal component directions: given centered
+X∈R n×p, ifVk =[v 1 . . .v k] ∈R p×k is the matrix whose columns contain the firstkprincipal
+component directions ofX, then
+XVkV T
+k =arg min
+rank(A)=k
+∥X−A∥ 2
+F =arg min
+rank(A)=k
+n∑︁
+i=1
+p∑︁
+j=1
+(Xij −A ij)2
+In other words,XVkV T
+k is the best rankkapproximation toX
+
+--- Page 86 ---
+
+Estimating PCA
+XVkV T
+k =arg min
+rank(A)=k
+∥X−A∥ 2
+F =arg min
+rank(A)=k
+n∑︁
+i=1
+p∑︁
+j=1
+(Xij −A ij)2
+There are three ways to solve this estimation problem:
+▶ Singular Value Decomposition (SVD)
+▶ Alternating Least Squares (ALS)
+▶ Multidimensional Scaling (MDS)
+
+--- Page 87 ---
+
+Singular Value Decomposition (SVD)
+There are various ways to compute principal component directions.
+We’ll consider computation via the singular value decomposition (SVD) ofX:
+X|{z}
+n×p
+=U|{z}
+n×p
+D|{z}
+p×p
+V T
+|{z}
+p×p
+HereD=diag(d 1, . . . ,d p)is diagonal withd1 ≥. . .≥d p ≥0, andU,Vboth have orthonormal
+columns. This gives us everything:
+▶ columns ofV,v 1, . . . ,v p ∈R p, are the principal component directions
+▶ columns ofU,u 1, . . . ,u p ∈R n, are the normalized principal component scores
+▶ squaring thejth diagonal element ofDand dividing byn,d2
+j /n, gives the variance explained
+byv j
+(Don’t forget that we must first center the columns ofX!)
+
+--- Page 88 ---
+
+Matrix Decomposition
+▶ What if some values ofXare missing?
+▶ We can still estimateA, write as a product of two matrices (L,R):
+ˆL, ˆR=arg min
+L,R
+∑︁
+i,j|X ij observed
+(Xij −L i Rj)2
+▶ Can do this whenXisn’t missing values too!
+
+
+--- Page 89 ---
+
+Matrix Decomposition
+
+
+--- Page 90 ---
+
+Alternating Least Squares (ALS)
+ˆL, ˆR=arg min
+L,R
+∑︁
+i,j|X ij observed
+(Xij −L i Rj)2
+▶ How to solve this optimization problem?
+▶ Randomly initializeLandR, then iterate between the following two steps:
+1. Conditional onR, solve forL:
+min
+Li
+∑︁
+j|X ij observed
+(Xij −L i Rj )2
+2. Conditional onL, solve forR:
+min
+Rj
+∑︁
+i|X ij observed
+(Xij −L i Rj )2
+▶ This isalternating least squares (ALS)
+▶ Also an expectation maximization (EM) algorithm under certain distributional assumptions
+
+--- Page 91 ---
+
+Instrumented Principal Components Analysis (IPCA)
+Recall from last week the estimator for IPCA:
+min
+Γ,F
+1
+NT
+∑︁
+t
+(Rt −𝛽 t−1 Ft)′ (Rt −𝛽 t−1 Ft)subject to𝛽 t−1 =Z t−1 Γ
+First-order conditions (FOCs):
+Ft =(𝛽 ′
+t−1 𝛽t−1 ) −1 𝛽′
+t−1 Rt
+vec(Γ ′)=
+ ∑︁
+t
+[Zt−1 ⊗F ′
+t ]′ [Zt−1 ⊗F ′
+t ]
+! −1  ∑︁
+t
+[Zt−1 ⊗F ′
+t ]′Rt
+!
+▶ Iterate until convergence
+▶ This is alternating least squares...
+
+--- Page 92 ---
+
+Penalized ALS!
+▶ One benefit of ALS is that we can add a penalty term to each least squares step...
+▶ An alternative ALS procedure:
+1. Conditional onR, solve forL:
+min
+Li
+∑︁
+j|X ij observed
+(Xij −L i Rj )2 +𝜆 L||L i || 2
+2. Conditional onL, solve forR:
+min
+Rj
+∑︁
+i|X ij observed
+(Xij −L i Rj )2 +𝜆 R ||R j || 2
+
+--- Page 93 ---
+
+K-Means & PCA
+▶ There is a close link between PCA and the earlier clustering methods we saw (e.g. K-means)
+▶ K-Means Clustering via Principal Components AnalysisDing and He, 2004.
+▶ Shows that K-means solves the same optimization problem as PCA with additional constraints
+
+
+--- Page 94 ---
+
+Non-Linear Dimension Reduction
+
+--- Page 95 ---
+
+The Inner-Product Matrix
+GivenX∈R n×p, the matrixXXT ∈R n×n is the inner-product matrix. IfXhasith rowxi ∈R p, then
+(XX T )ij =x T
+i xj
+Suppose that we wanted the principal component scores ofX, but we only hadXXT. Could we still
+compute them?
+Yes! Using the singular value decompositionX=UDVT, we have
+XX T =UD 2UT
+This is called an eigendecomposition ofXXT because the columns ofUare eigenvectors ofXXT.
+(Check?)
+Hence we can compute the eigendecomposition or “factorize” the inner product matrixXXT, and
+then the scores are given by the columns ofUD, i.e.,dj uj,j=1, . . . ,p
+
+--- Page 96 ---
+
+Low-Dim Representation from Distances Only
+Suppose that instead of measuringX∈Rn×p directly, we only measured the distances between pairs
+of observations,
+Δij =∥x i −x j ∥2,i,j=1, . . . ,n
+This gives us a distance matrixΔ∈Rn×n
+We want a lower-dimensional representationz1, . . . ,z n ∈R k, for some smallk(e.g.k=2or3),
+such that∥z i −z j ∥2 ≈Δ ij, for everyi,j=1, . . . ,n
+We saw that the principal component scores do exactly this, but these rely onXorXXT, which we
+don’t have here. We can only use the distancesΔij
+Is this possible?
+
+--- Page 97 ---
+
+Multidimensional Scaling (MDS)
+Assume thatX∈R n×p has been column centered (this is enough to deal with translation
+unidentifiability)
+Multidimensional scaling (MDS): given distance matrixΔ∈Rn×n, we
+1. Recover the inner-product matrixB=XXT ∈R n×n
+2. FactorizeBto get the firstkprincipal component scores
+(Called classical multidimensional scaling, there are other flavors,
+e.g., least squares multidimensional scaling)
+We’ve already seen how to do step 2: remember that we compute
+the eigendecompositionB=UD 2UT and then the firstkprincipal component scores are the firstk
+columns ofUD
+So, how do we do step 1, i.e., how do we recoverB?
+
+--- Page 98 ---
+
+Recovering Inner-Products from Distances
+The following procedure can be used to recover the inner-productsB=XXT fromΔ:
+1. ComputeA ij =− 1
+2 Δ2
+ij to form the matrixA∈R n×n
+2. Double centerA—i.e., center both the columns and rows ofA—to recover the matrix
+B∈R n×n. Note that this is the same as:
+B=(I−M)A(I−M)
+whereM= 1
+n 11T ∈R n×n
+
+--- Page 99 ---
+
+Example: Donut Data
+Recall donut example:X∈R 2000×3. The left plot showsXand the right plot shows the
+multidimensional scaling representationZ∈R 2000×3 computed from the distance matrix
+Δ∈R 2000×2000
+The multidimensional scaling recovery is the same as the principal component scores
+UD∈R 2000×3. This is the same asXup to an orthonormal transformation—recall thatUD=XV
+
+--- Page 100 ---
+
+Beyond Euclidean Distance
+If theΔij were actual Euclidean distances between the rows of a centered matrixX∈Rn×p, we get
+back the firstkprincipal component scores exactly. Importantly, multidimensional scaling can be
+applied to anyΔij, not just Euclidean distances
+There is a class of methods which construct a fancier metricΔij between high-dimensional points
+x1, . . . ,x n ∈R p, and then they feed theseΔij through multidimensional scaling to get a
+low-dimensional representationz1, . . . ,z n ∈R k. In this case, we don’t just get principal component
+scores, and our low-dimensional representation can end up being a nonlinear function of the data
+Why would we want to use non-
+Euclidean distances?
+
+
+--- Page 101 ---
+
+Tangent Distance
+Tangentdistanceisanexampleofafanciermetricthatwecanrunthroughmultidimensionalscaling
+(though used elsewhere too)
+A motivating example is the digit data. Here, we have16×16images, treated as pointsxi ∈R 256
+(i.e., they are unraveled into vectors). If we take, e.g., a “3” and rotate it through a small angle, we
+would like for the rotated image to be considered close to the original image. This is not necessarily
+true of Euclidean distance
+We could defineΔrotation
+ij to be the shortest Euclidean distance between a rotated version ofxi and
+rotated version ofxj. What’s the problem with this? (Hint: think about rotating a “6”)
+
+--- Page 102 ---
+
+Tangent Distance
+
+
+--- Page 103 ---
+
+Tangent Distance
+
+
+--- Page 104 ---
+
+Example: Handwritten Digits
+Example:n=1220images of handwritten digits andp=256, i.e., each image is16×16pixels.
+Left plot: first two multidimensional scaling dimensions using Euclidean distances (principal
+component directions), right plot: using tangent distances
+
+
+--- Page 105 ---
+
+Isometric Feature Mapping
+Isometric feature mapping (Isomap) learns structure in a more general setting to define distances.
+The basic idea is to construct a graphG=(V,E), i.e., construct edgesEbetween vertices
+V={1, . . . ,n}, based on the structure betweenx1, . . . ,x n ∈R p.
+Then we define a graph distanceΔIsomap
+ij betweeniandj, and use multidimensional scaling for our
+low-dimensional representation
+
+
+--- Page 106 ---
+
+The Isomap Graph Distances
+Constructing the graph: for each pairi,j, we connecti,jwith an edge if either:
+▶ xi is one ofxj’smnearest neighbors, or
+▶ xj is one ofxi’smnearest neighbors
+The weight of this edgee={i,j}is thenw e =∥x i −x j ∥2
+Defining graph distances: now that we have built a graph, i.e., we have built an edge setE, we
+define the graph distanceΔIsomap
+ij betweenx i andx j to be the shortest path in our graph fromitoj:
+ΔIsomap
+ij =min
+pathsP⊆Efromitoj
+∑︁
+e∈P
+we
+(This can be computed by, e.g., Dijkstra’s algorithm or Floyd’s algorithm)
+
+--- Page 107 ---
+
+Example: Hand Positions
+Example:n=3000images of hands andp=4096, i.e., each image is64×64pixels. Isomap
+applied withm=6nearest neighbors, reduced tok=2dimensions:
+
+
+--- Page 108 ---
+
+Local Linear Embedding
+Local linear embedding (LLE) is a similar method in spirit but its details are very different. It
+doesn’t use multidimensional scaling
+The basic idea has two steps:
+1. Learn a bunch of local approximations to the structure betweenx1, . . . ,x n ∈R p
+2. Learn a low-dimensional representationz1, . . . ,z n ∈R k that best matches these local
+approximations
+What is meant by such local approximations? We simply try to predict eachxi by a linear function
+of nearby pointsxj (hence the namelocal linear embedding)
+
+--- Page 109 ---
+
+Local Linear Embedding
+For eachxi ∈R p, we first find itsmnearest neighbors, and collect their indices asN (i). Then we
+build a weight vectorwi ∈R n, settingwij =0forj∉N (i)and fittingw ij forj∈ N (i)by minimizing
+
+xi −
+∑︁
+j∈ N (i)
+wij xj
+
+2
+2
+Finally, we take these weightsw1, . . . ,w n ∈R n and we fit the low-dimensional representation
+z1, . . . ,z n ∈R k, by minimizing
+n∑︁
+i=1
+
+zi −
+n∑︁
+j=1
+wij zj
+
+2
+2
+
+--- Page 110 ---
+
+Local Linear Embedding
+
+
+--- Page 111 ---
+
+Example: facial expressions
+Example:n=2000images of faces andp=560, i.e., each image is20×28pixels. Local linear
+embedding applied withm=12nearest neighbors, reduced tok=2dimensions:
+(From Roweis et al. (2000))
+
+--- Page 112 ---
+
+Kernel PCA
+▶ Recall from lecture 1: by projecting our original features into a higher dimensional space can
+deal with non-linearities
+▶ Kernel functionis the inner product in some feature space:
+K(x i,x j)=𝜙(x i)T 𝜙(x j)
+
+
+--- Page 113 ---
+
+Isomap & LLE as Kernel PCA
+▶ The same idea can be applied to PCA...
+ReplaceXX T with kernel version
+▶ A kernel view of dimensionality reduction of
+manifoldsHam et al., 2004
+▶ Shows that Isomap, LLE, and Laplacian
+Eigenmaps can be written as kernel PCA
+with specific Gram matrices (distance
+matrix)
+
+
+--- Page 114 ---
+
+Autoencoders
+
+--- Page 115 ---
+
+Autoencoder Basics
+▶ An autoencoder is a special type of feed
+forward neural network which does the
+following
+▶ Encodes its inputxi into a hidden
+representationh
+▶ Decodes the input again from this hidden
+representation
+▶ The model is trained to minimize a certain
+loss function which will ensure thatˆxi is
+close toxi
+
+--- Page 116 ---
+
+Autoencoder Basics
+▶ Let us consider the case where
+dim(h)<dim(x i)
+▶ If we are still able to reconstructˆxi perfectly
+fromh, then what does it say abouth?
+▶ his a loss-free encoding ofxi. It captures all
+the important characteristics ofxi
+▶ Do you see an analogy with PCA...
+
+--- Page 117 ---
+
+Autoencoder Basics
+▶ Consider the case when the inputs are real
+valued
+▶ The objective of the autoencoder is to
+reconstruct ˆxi to be as close toxi as possible
+▶ This can be formalized using the following
+objective function:
+min
+W,W ∗,c,b
+1
+m
+m∑︁
+i=1
+n∑︁
+j=1
+(ˆxij −x ij)2
+i.e.,
+min
+W,W ∗,c,b
+1
+m
+m∑︁
+i=1
+(ˆxi −x i)T (ˆxi −x i)
+▶ We can then train the autoencoder just like a
+regular feedforward network using
+back-propagation
+
+--- Page 118 ---
+
+Autoencoders and PCA
+▶ The encoder part of an autoencoder is
+equivalent to PCA if we
+▶ use a linear encoder
+▶ use a linear decoder
+▶ use squared error loss function
+▶ normalize the inputs to
+ˆxij = 1√
+m
+ 
+xij − 1
+m
+m∑︁
+k=1
+xkj
+!
+
+--- Page 119 ---
+
+Autoencoders and PCA
+PCA Autoencoder
+
+
+--- Page 120 ---
+
+Regularization in Autoencoders
+▶ While poor generalization could happen
+even in undercomplete autoencoders, it is an
+even more serious problem for overcomplete
+autoencoders
+▶ Here, (as stated earlier) the model can
+simply learn to copyxi tohand thenhto ˆxi
+▶ To avoid poor generalization, we need to
+introduce regularization
+
+--- Page 121 ---
+
+L2 Regularization in Autoencoders
+▶ The simplest solution is to add a
+L2-regularization term to the objective
+function
+min
+𝜃 ,W,W ∗,b,c
+1
+m
+m∑︁
+i=1
+n∑︁
+j=1
+(ˆxij −x ij)2 +𝜆∥𝜃∥ 2
+▶ This is very easy to implement and just adds
+a term𝜆Wto the gradient 𝜕L (𝜃)
+𝜕W (and
+similarly for other parameters)
+
+--- Page 122 ---
+
+Denoising Autoencoders
+▶ Can train an autoencoder to learn todenoiseinput by giving inputcorruptedinstance˜xand
+targetinguncorruptedinstancex
+▶ Example noise models:
+▶ Gaussian noise: ˜x=x+z, wherez∼ N (0, 𝜎 2I)
+▶ Masking noise: zero out some fraction𝜈of components ofx
+▶ Salt-and-pepper noise: choose some fraction𝜈of components ofxand set each to its min or max
+value (equally likely)
+▶ Why?Now your autoencoder can learn underlying structure even if the out-of-sample data is
+noisy
+
+--- Page 123 ---
+
+Denoising Autoencoders
+
+
+--- Page 124 ---
+
+Denoising Autoencoders
+
+
+--- Page 125 ---
+
+Denoising Autoencoders
+▶ How does it work?
+▶ Even though, e.g., MNIST data are in a 784-dimensional space, they lie on a low-dimensional
+manifoldthat captures their most important features
+▶ Corruption process moves instancexoff of manifold
+▶ Encoderf 𝜃 and decoderg𝜃 ′ are trained to project˜xback onto manifold
+
+
+--- Page 126 ---
+
+Semi-Supervised Learning
+▶ Can re-use autoencoders for downstream tasks (e.g. forecasting)
+
+
+--- Page 127 ---
+
+Transfer Learning
+▶ Similarly, can use “off-the-shelf” autoencoders and then specialize them to a specific task
+
+
+--- Page 128 ---
+
+Variational Autoencoders
+▶ VAE is an autoencoder that is also a generative model
+⇒Can generate new instances according to a probability distribution
+▶ E.g., hidden Markov models, Bayesian networks
+▶ Contrast withdiscriminative models, which predict classifications
+▶ Encoderfoutputs[𝜇, 𝜎] T
+▶ Pair(𝜇 i , 𝜎i )parameterizes Gaussian distribution for dimensioni=1, . . . ,n
+▶ Drawz i ∼ N (𝜇 i , 𝜎i )
+▶ Decode thislatent variablezto getg(z)
+
+
+--- Page 129 ---
+
+Variational Autoencoders
+
+
+--- Page 130 ---
+
+Variational Autoencoders
+▶ Maximum likelihood(ML) approach for training generative models: find a model (𝜃) with
+maximum probability of generating the training setX
+▶ Achieve this by minimizing the sum of:
+▶ End-to-end AE loss (e.g., square, cross-entropy)
+▶ Regularizermeasuring distance (K-L divergence) from latent distributionq(z|x)andN (0,I)(=
+standard multivariate Gaussian)
+▶ N (0,I)also considered theprior distributionoverz(= distribution when noxis known)
