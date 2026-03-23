@@ -4,7 +4,6 @@
 The University of Chicago Booth School of Business — Winter 2026
 
 **Team:** Alan Donnelly, Andrew McLaughlin, Robert Asgeirsson, Chris Mulligan
-*(Master's in Financial Mathematics)*
 
 ---
 
