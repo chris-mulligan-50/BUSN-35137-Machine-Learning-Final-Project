@@ -1,7 +1,7 @@
 # Machine Learning in NBA Over/Under Betting
 
 **Business 35137: Machine Learning in Finance**
-The University of Chicago Booth School of Business — Winter 2026
+The University of Chicago Booth School of Business (January - March 2026)
 
 **Team:** Alan Donnelly, Andrew McLaughlin, Robert Asgeirsson, Chris Mulligan
 
